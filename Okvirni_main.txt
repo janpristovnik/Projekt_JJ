@@ -1,0 +1,9 @@
+Main file:
+
+While Count_zivih > 0:
+	While mesecno_izplacilo >0 in total_loss < _ in trajanje_izdajanja_kreditov < _ :
+		Loan.generiraj_kredit;
+		Bank.belezi_kredit;
+		mi -= Loan.kredit_nominal;
+	Bank.mesecni_obracun
+Bank.summary -> Vrne excel 
