@@ -6,5 +6,5 @@ start_month -> argument podan v loan.generiraj_kredit
 maturity * 
 moratorij *
 anuity *
-survtime -> sid.py
+survtime -> argument podan v main.py
 repay -> * / sid.py 
