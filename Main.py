@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 
-path = 'C:\\Users\\jrems\\Documents\\SID\\'
+path = 'C:\\Users\\jpristovnik\\Documents\\SID\\'
 
 from C_Loan import Loan
 
