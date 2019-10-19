@@ -21,31 +21,6 @@ def logit (score):
     return math.exp(score)/(1+math.exp(score))
 
         
-        
-def coc_SID(grade):
-
-    sid = 0.2
-
-    i = masterscale.index[masterscale['grade']==grade].tolist()[0]
-
-    rw = masterscale['RW'][i]
-
-    coc = 0.606*sid*0.08*0.1 + (1-0.606)*rw*0.08*0.1
-
-    return coc
-
- 
-
-def coc_brez(grade):
-
-    i = masterscale.index[masterscale['grade']==grade].tolist()[0]
-
-    rw = masterscale['RW'][i]
-
-    coc = rw*0.08*0.1
-
-    return coc
-
 
 def gen_masterscale():
     #masterscale
@@ -67,8 +42,31 @@ def gen_masterscale():
     
     masterscale.index = pd.IntervalIndex.from_arrays(masterscale['PD_low'],masterscale['PD_high'],closed='right')
     
-    masterscale['coc'] = masterscale['grade'].apply(coc_SID)
+    def coc_SID(grade):
     
+        sid = 0.2
+    
+        i = masterscale.index[masterscale['grade']==grade].tolist()[0]
+    
+        rw = masterscale['RW'][i]
+    
+        coc = 0.606*sid*0.08*0.1 + (1-0.606)*rw*0.08*0.1
+
+        return coc
+
+ 
+    masterscale['coc'] = masterscale['grade'].apply(coc_SID)
+      
+    def coc_brez(grade):
+    
+        i = masterscale.index[masterscale['grade']==grade].tolist()[0]
+    
+        rw = masterscale['RW'][i]
+    
+        coc = rw*0.08*0.1
+    
+        return coc
+  
     masterscale['coc_brez'] = masterscale['grade'].apply(coc_brez)
 
     return masterscale
