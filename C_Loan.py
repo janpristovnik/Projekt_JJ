@@ -26,7 +26,7 @@ PD_si = 1.0
 ###############################################################################
 
 class Loan:
-    def __init__(self, month_i):
+    def __init__(self, month_i, data):
         self.notional   = rand_notional()
         self.start_mnth = month_i
         self.maturity   = rand_maturity()
@@ -34,6 +34,10 @@ class Loan:
         self.annuity    = self.notional / (self.maturity - self.moratorium)
         self.LGD        = rand_LGD()
         self.PD         = rand_PD()
+        self.grade      = grade(data,self.PD)
+        self.rating     = rating(data,self.PD)
+        self.survtime   = survtime(data, self.rating)
+        
 
     def age(self):
         if (self.maturity > 0):
@@ -59,10 +63,15 @@ def rand_PD():
 def logit (score):
     return math.exp(score) / (1 + math.exp(score))
 
-def yeartomonth(pd):
-    return 1-math.pow(1-pd,1/12)
+def yeartomonth(PD):
+    return 1-math.pow(1-PD,1/12)
 
-def survtime(sss,a):
+def survtime(data,sss):
+    lamdas = data.lamdas
+    y0 = data.y0
+    lm = data.lm
+    isum = data.isum
+    a = np.random.random_sample()
     idx=lamdas[sss].index.get_loc(a)
     ld=lamdas[sss].iloc[idx]
     yy0=y0[sss].iloc[idx]
@@ -71,41 +80,15 @@ def survtime(sss,a):
     x= -math.log(-(a-s1)*ld*isum[sss]/yy0+math.exp(-ld*x1))/ld
     return x
 
-def coc_SID(grade):
-    sid = 0.2
-    i = masterscale.index[masterscale['grade']==grade].tolist()[0]
-    rw = masterscale['RW'][i]
-    coc = 0.606*sid*0.08*0.1 + (1-0.606)*rw*0.08*0.1
-    return coc
+def grade(data,PD):
+    masterscale = data.masterscale
+    return masterscale.iloc[masterscale.index.get_loc(PD)]["grade"]
 
-def coc_brez(grade):
-    i = masterscale.index[masterscale['grade']==grade].tolist()[0]
-    rw = masterscale['RW'][i]
-    coc = rw*0.08*0.1
-    return coc
+#meji ga lohk zbrišemo ker je isti k grade 
+def rating(data,PD):
+    masterscale = data.masterscale
+    return masterscale.iloc[masterscale.index.get_loc(PD)]["rating"]
+
 
  
 
- 
-
-#masterscale
-
-   
-
-masterscale = pd.DataFrame({'rating': ['AAA','AA+','AA','AA-','A+','A','A-',
-                                       'BBB+','BBB','BBB-','BB+','BB','BB-','B+','B','B-',
-                                       'C+','C'], \
-                            'grade' : range(1,19), \
-                            'RW'    : [0.2,0.2,0.2,0.2,0.5,0.5,0.5,1,1,1,1,1,1,1.5,1.5,1.5,1.5,1.5], \
-                            'cor'   : [0.2,0.2,0.2,0.2,0.5,0.5,0.5,1,1,1,1,1,1,1.5,1.5,1.5,1.5,1.5]})
-
-masterscale['PD_low']= (masterscale['grade']-0.5)*0.6113-12.247
-
-masterscale['PD_high']= (masterscale['grade']+0.5)*0.6113-12.247
-
-masterscale['PD_low']=masterscale['PD_low'].apply(logit)
-masterscale['PD_high']=masterscale['PD_high'].apply(logit)
-masterscale.loc[masterscale['rating']=='C','PD_high']=1
-masterscale.index = pd.IntervalIndex.from_arrays(masterscale['PD_low'],masterscale['PD_high'],closed='right')
-masterscale['coc'] = masterscale['grade'].apply(coc_SID)
-masterscale['coc_brez'] = masterscale['grade'].apply(coc_brez)

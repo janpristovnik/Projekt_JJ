@@ -14,7 +14,8 @@ class ImportSID_PD:
         self.masterscale = gen_masterscale()
         self.lamdas = gen_lamdas_y0(path)[0]
         self.y0 = gen_lamdas_y0(path)[1]
-        
+        self.lm = gen_lamdas_y0(path)[2]
+        self.isum = gen_lamdas_y0(path)[3]
 
 def logit (score):
 
@@ -120,5 +121,5 @@ def gen_lamdas_y0(path):
         y0dict[s]=y0[s].copy()
         y0dict[s].index=pd.IntervalIndex.from_breaks(intinv[s],closed='left')
     
-    return (lamdas, y0dict)
+    return (lamdas, y0dict, lm, isum)
             
