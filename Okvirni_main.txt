@@ -1,7 +1,9 @@
 Main file:
 
+Sid_pd.import #uvozi pd podatke
+
 While Count_zivih > 0:
-	While mesecno_izplacilo >0 in total_loss < _ in trajanje_izdajanja_kreditov < _ :
+	While mesecno_izplacilo >0 in total_loss < _ in trajanje_izdajanja_kreditov < _ : #vsi pogoji bi bili metode v C_banka
 		Loan.generiraj_kredit;
 		Bank.belezi_kredit;
 		mi -= Loan.kredit_nominal;
