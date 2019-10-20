@@ -2,10 +2,14 @@ Main file:
 
 Sid_pd.import #uvozi pd podatke
 
-While Count_zivih > 0:
+While Count_zivih > 0 : #Odprt projekt/ portfelj 
 	While mesecno_izplacilo >0 in total_loss < _ in trajanje_izdajanja_kreditov < _ : #vsi pogoji bi bili metode v C_banka
+	#Izdajamo kredite
 		Loan.generiraj_kredit;
-		Bank.belezi_kredit;
+		Kle je treba kreirat nek DF
+		Bank.belezi_kredit; (Ta del useless) To je lastnost
+		kredita -> ko se generira kredit se ga nastavi da je alive
+		in da še ni poravnan 
 		mi -= Loan.kredit_nominal;
 	Bank.mesecni_obracun
 Bank.summary -> Vrne excel 
