@@ -23,6 +23,9 @@ LGD_b   = LGD_a * (1 / LGD_mu - 1)
 PD_mu = -3.2
 PD_si = 1.0
 
+wo_duration = 36
+vzvod = 1
+
 ###############################################################################
 
 class Loan:
@@ -40,6 +43,7 @@ class Loan:
         self.alive      = 1
         self.settled    = 0
         self.repay      = 0
+        self.repay_SID  = 0
         self.default_mnth = -1
         self.loss       = 0
         
@@ -95,6 +99,25 @@ def rating(data,PD):
     masterscale = data.masterscale
     return masterscale.iloc[masterscale.index.get_loc(PD)]["rating"]
 
+def refresh(self, month,):
+    if (self.mora + self.start_month < month) & (self.start_month + self.maturity >=month) & (self.survtime*12.0 + self.start_month >= month) & (self.alive ==1) & (default_mnth == -1):
+        self.repay += self.annuity
+        self.repay_SID += self.annuity/self.vzvod
+    if (self.mora + self.start_month < month) & (self.start_month + self.maturity >=month) & (self.survtime*12.0 + self.start_month < month) & (self.alive ==1) & (default_mnth == -1):
+        self.default_mnth = month
+    if (self.mora + self.start_month < month) & (self.start_month + self.maturity >=month) & (self.alive ==1) & (default_mnth > -1):
+        self.loss += self.annuity
+    if (self.default_mnth == -1) & (self.start_month + self.maturity == month) & (self.alive == 1):
+        self.settled == 1
+    if (self.start_month + self.maturity == month) & (self.alive == 1):
+        self.alive = 0
+    if (self.default_mnth > -1) & (self.start_month + self.maturity + wo_duration == month) & (self.alive == 1):
+        self.settled == 1
+    if (self.default_mnth > -1) & (self.start_month + self.maturity + wo_duration == month) & (self.alive == 1):
+        
+    if (self.default_mnth != -1) & (self.start_month + self.maturity + wo_duration == month):
+        self.settled == 1 
 
+        
  
 
