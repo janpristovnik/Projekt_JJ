@@ -37,6 +37,12 @@ class Loan:
         self.grade      = grade(data,self.PD)
         self.rating     = rating(data,self.PD)
         self.survtime   = survtime(data, self.rating)
+        self.alive      = 1
+        self.settled    = 0
+        self.repay      = 0
+        self.default_mnth = -1
+        self.loss       = 0
+        
         
 
     def age(self):
