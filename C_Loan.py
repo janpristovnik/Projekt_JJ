@@ -23,36 +23,38 @@ LGD_b   = LGD_a * (1 / LGD_mu - 1)
 PD_mu = -3.2
 PD_si = 1.0
 
-wo_duration = 36
-vzvod = 1
+
 
 ###############################################################################
 
 class Loan:
     def __init__(self, month_i, data):
-        self.notional   = rand_notional()
-        self.start_mnth = month_i
-        self.maturity   = rand_maturity()
-        self.moratorium = rand_moratorium(self.maturity/3, self.maturity/2)
-        self.annuity    = self.notional / (self.maturity - self.moratorium)
-        self.LGD        = rand_LGD()
-        self.PD         = rand_PD()
-        self.grade      = grade(data,self.PD)
-        self.rating     = rating(data,self.PD)
-        self.survtime   = survtime(data, self.rating)
-        self.alive      = 1
-        self.settled    = 0
-        self.repay      = 0
-        self.repay_SID  = 0
-        self.default_mnth = -1
-        self.loss       = 0
-        
-        
+        maturity   = rand_maturity()
+        maturity_abs = maturity + month_i
+        notional   = rand_notional()
+        moratorium = rand_moratorium(maturity/3, maturity/2)
+        LGD        = rand_LGD()
+        PD         = rand_PD()
+        rating     = f_rating(data,PD)
+        survtime   = f_survtime(data,rating)*12.0
+        self.start_month = month_i
+        self.start_pay = month_i + moratorium
+        if survtime < moratorium:
+            default_month = self.start_pay
+        else:
+            default_month = month_i + math.ceil(survtime)
+        if default_month <= maturity_abs:
+            self.end_month = default_month
+            self.default_flag = True
+        else:
+            self.end_month = maturity_abs
+            self.default_flag = False
+        self.annuity    = notional / (maturity - moratorium)
+        self.initial_loss = (maturity_abs - self.end_month + 1*self.default_flag)*self.annuity
+        self.recovered_loss = self.initial_loss*(1-LGD)
 
-    def age(self):
-        if (self.maturity > 0):
-            self.maturity -= 1
-            
+
+           
 def rand_notional():
     porlen = math.log(AMT_MAX) * (1 - AMT_MIN / AMT_MAX) * AMT_MAX / AMT_MIN
     nm = np.random.random_sample() * (porlen - 1) + 1
@@ -73,10 +75,7 @@ def rand_PD():
 def logit (score):
     return math.exp(score) / (1 + math.exp(score))
 
-def yeartomonth(PD):
-    return 1-math.pow(1-PD,1/12)
-
-def survtime(data,sss):
+def f_survtime(data,sss):
     lamdas = data.lamdas
     y0 = data.y0
     lm = data.lm
@@ -90,34 +89,10 @@ def survtime(data,sss):
     x= -math.log(-(a-s1)*ld*isum[sss]/yy0+math.exp(-ld*x1))/ld
     return x
 
-def grade(data,PD):
-    masterscale = data.masterscale
-    return masterscale.iloc[masterscale.index.get_loc(PD)]["grade"]
-
 #meji ga lohk zbrišemo ker je isti k grade 
-def rating(data,PD):
+def f_rating(data,PD):
     masterscale = data.masterscale
     return masterscale.iloc[masterscale.index.get_loc(PD)]["rating"]
 
-def refresh(self, month,):
-    if (self.mora + self.start_month < month) & (self.start_month + self.maturity >=month) & (self.survtime*12.0 + self.start_month >= month) & (self.alive ==1) & (default_mnth == -1):
-        self.repay += self.annuity
-        self.repay_SID += self.annuity/self.vzvod
-    if (self.mora + self.start_month < month) & (self.start_month + self.maturity >=month) & (self.survtime*12.0 + self.start_month < month) & (self.alive ==1) & (default_mnth == -1):
-        self.default_mnth = month
-    if (self.mora + self.start_month < month) & (self.start_month + self.maturity >=month) & (self.alive ==1) & (default_mnth > -1):
-        self.loss += self.annuity
-    if (self.default_mnth == -1) & (self.start_month + self.maturity == month) & (self.alive == 1):
-        self.settled == 1
-    if (self.start_month + self.maturity == month) & (self.alive == 1):
-        self.alive = 0
-    if (self.default_mnth > -1) & (self.start_month + self.maturity + wo_duration == month) & (self.alive == 1):
-        self.settled == 1
-    if (self.default_mnth > -1) & (self.start_month + self.maturity + wo_duration == month) & (self.alive == 1):
-        
-    if (self.default_mnth != -1) & (self.start_month + self.maturity + wo_duration == month):
-        self.settled == 1 
-
-        
- 
+    
 

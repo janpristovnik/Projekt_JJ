@@ -152,7 +152,7 @@ masterscale['coc_brez'] = masterscale['grade'].apply(coc_brez)
 
  
 
-path="C:\\Users\\lhrobat\\Documents\\PROJECTS\\SID\\"
+path="C:\\Users\\jrems\\Documents\\SID\\"
 
  
 
@@ -264,7 +264,7 @@ porlen = math.log(amt_max)*(1-amt_min/amt_max)*amt_max/amt_min
 
 #low_mora=0
 
-Nscen=1000
+Nscen=100
 
 slength=1600 #Število izdanih kreditov
 
